@@ -11,7 +11,7 @@ const post_validation = require("./validation.js")
 //Service variables init
 const PORT = 3001;
 let db = null;
-const db_filter = {projection:{_id:0,title:1, main_photo:1, price:1}}
+const db_filter = {projection:{_id:0,title:1, main_photo:1, price:1}};
 
 //bobyParser connect and settings
 app.use(bodyParser.json())
@@ -27,9 +27,9 @@ app.use(function(err, req, res, next) {
 /* Start server and get database */
 function serverStart(){
     app.listen(PORT, async () => {
-        console.log(`Server app listening on port ${PORT}...`)
+        console.log(`Server app listening on port ${PORT}...`);
             
-        db = db_module.getDb()
+        db = db_module.getDb();
         //Getting a link to the database
     })
 }
@@ -189,7 +189,10 @@ app.get('/api/one/:id', async (req, res) => {
     try {
         id = ObjectID(req.params.id);
     } catch(err){
-        return res.status(400).send(`Invalid ObjectId`);
+        return res.status(400).json({
+            "status": "Error",
+            "message": `Invalid ObjectId`
+        });
     }
     
     //If fields exist and are not empty
@@ -208,8 +211,11 @@ app.get('/api/one/:id', async (req, res) => {
         //Find publication
         await db.findOne({_id: id}, filter, (err, data) => {
             if(err){
-                console.log(err)
-                res.status(500).send(`Database error ${err}`)
+                console.log(err);
+                res.status(500).json({
+                    "status": "Error",
+                    "message": `Database error ${err}`
+                });
             }
             else {
                 //Send post if it exists
@@ -217,7 +223,10 @@ app.get('/api/one/:id', async (req, res) => {
                     res.status(200).send(data);
                 }
                 else { //Or send error
-                    res.status(404).send(`Nothing found since id: ${id}`)
+                    res.status(404).json({
+                        "status": "Not Found",
+                        "message": `Nothing found since id: ${id}`
+                    });
                 }
             }
         });
@@ -228,7 +237,10 @@ app.get('/api/one/:id', async (req, res) => {
         await db.findOne({_id: id}, db_filter,(err, data) => {
             if(err){
                 console.log(err);
-                res.status(500).send(`Database error ${err}`);
+                res.status(500).json({
+                    "status": "Error",
+                    "message": `Database error ${err}`
+                });
             }
             else {
                 //Send post if it exists
@@ -236,7 +248,10 @@ app.get('/api/one/:id', async (req, res) => {
                     res.status(200).send(data);
                 }                
                 else { //Or send error
-                    res.status(404).send(`Nothing found since id: ${id}`);
+                    res.status(404).json({
+                        "status": "Not Found",
+                        "message": `Nothing found since id: ${id}`
+                    });
                 }
             }
         });
